@@ -20,7 +20,7 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+		return Inertia::render('Tasks/CreateUpdateTask');
     }
 
     /**
