@@ -1,9 +1,19 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {Head} from "@inertiajs/react";
-import {Button, FormControl, TextField} from "@mui/material";
+import {Head, useForm} from "@inertiajs/react";
+import {Box, Button, FormControl, TextField, Container} from "@mui/material";
 
 
 export default function CreateUpdateTask() {
+
+	const { data, setData, post, processing, errors } = useForm({
+		title: "",
+		description: "",
+	});
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		post(route("tasks.store"));
+	};
 
 	return (
 		<AuthenticatedLayout
@@ -17,21 +27,40 @@ export default function CreateUpdateTask() {
 
 			<div className="py-12">
 				<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-					<div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-
-						<div className="p-6 text-gray-900">
-							<FormControl>
-								<TextField id="title" label="title" variant="outlined" margin="dense" />
-								<TextField
-									label="Description"
-									multiline
-									rows={4}
-									variant="outlined"
-									fullWidth
-								/>
-							</FormControl>
-						</div>
-					</div>
+					<Container className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+						<Box component="form" onSubmit={handleSubmit} noValidate>
+							<TextField
+								label="Title"
+								variant="outlined"
+								fullWidth
+								margin="normal"
+								value={data.title}
+								onChange={(e) => setData("title", e.target.value)}
+								error={!!errors.title}
+								helperText={errors.title}
+							/>
+							<TextField
+								label="Description"
+								variant="outlined"
+								fullWidth
+								margin="normal"
+								multiline
+								rows={4}
+								value={data.description}
+								onChange={(e) => setData("description", e.target.value)}
+								error={!!errors.description}
+								helperText={errors.description}
+							/>
+							<Button
+								type="submit"
+								variant="contained"
+								fullWidth
+								disabled={processing}
+							>
+								Create Task
+							</Button>
+						</Box>
+					</Container>
 				</div>
 			</div>
 		</AuthenticatedLayout>

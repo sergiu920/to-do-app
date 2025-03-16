@@ -28,7 +28,17 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+		echo "STORE METHOD";
+        dd($request->all());
+
+/*		$request->validate([
+			'title' => 'required|string|max:255',
+			'description' => 'required|string',
+		]);
+
+		Task::create($request->all());
+
+		return redirect()->route('tasks.index'); // Redirect back to tasks list*/
     }
 
     /**
