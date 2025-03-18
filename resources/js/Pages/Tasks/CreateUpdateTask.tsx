@@ -29,35 +29,41 @@ export default function CreateUpdateTask() {
 				<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
 					<Container className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
 						<Box component="form" onSubmit={handleSubmit} noValidate>
-							<TextField
-								label="Title"
-								variant="outlined"
-								fullWidth
-								margin="normal"
-								value={data.title}
-								onChange={(e) => setData("title", e.target.value)}
-								error={!!errors.title}
-								helperText={errors.title}
-							/>
-							<TextField
-								label="Description"
-								variant="outlined"
-								fullWidth
-								margin="normal"
-								multiline
-								rows={4}
-								value={data.description}
-								onChange={(e) => setData("description", e.target.value)}
-								error={!!errors.description}
-								helperText={errors.description}
-							/>
+							<div>
+								<TextField
+									label="Title"
+									variant="outlined"
+									fullWidth
+									margin="normal"
+									value={data.title}
+									onChange={(e) => setData("title", e.target.value)}
+									error={!!errors.title}
+									helperText={errors.title}
+									required
+								/>
+							</div>
+							<div>
+								<TextField
+									label="Description"
+									variant="outlined"
+									fullWidth
+									margin="normal"
+									multiline
+									rows={4}
+									value={data.description}
+									onChange={(e) => setData("description", e.target.value)}
+									error={!!errors.description}
+									helperText={errors.description}
+									required
+								/>
+							</div>
 							<Button
 								type="submit"
 								variant="contained"
 								fullWidth
 								disabled={processing}
 							>
-								Create Task
+								{processing ? "Submitting..." : "Create a task"}
 							</Button>
 						</Box>
 					</Container>

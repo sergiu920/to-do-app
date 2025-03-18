@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUpdateTaskRequest;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,19 +28,13 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUpdateTaskRequest $request)
     {
-		echo "STORE METHOD";
-        dd($request->all());
+		$validated = $request->validated();
 
-/*		$request->validate([
-			'title' => 'required|string|max:255',
-			'description' => 'required|string',
-		]);
+		Task::create($validated);
 
-		Task::create($request->all());
-
-		return redirect()->route('tasks.index'); // Redirect back to tasks list*/
+		return redirect()->route('tasks.index')->with('success', "The task '{$validated['title']}' has been created successfully!");
     }
 
     /**
