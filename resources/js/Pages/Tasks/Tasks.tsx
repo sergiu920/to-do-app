@@ -6,7 +6,7 @@ import { usePage } from "@inertiajs/react";
 
 export default function Tasks() {
 
-	const { flash } = usePage().props;
+	const { flash, tasks } = usePage().props;
 
 	return (
 		<AuthenticatedLayout
@@ -38,11 +38,18 @@ export default function Tasks() {
 							</Link>
 						</div>
 						<div className="p-6 text-gray-900">
-							Display list of tasks here
+							<h1>List of tasks</h1>
 
-							<ListItemButton component="a" href="#simple-list">
-								<ListItemText primary="Spam" />
-							</ListItemButton>
+							<ul>
+								{tasks.map((task) => (
+									<li key={task.id}>
+										<ListItemButton>
+											<ListItemText primary={task.title} />
+										</ListItemButton>
+									</li>
+								))}
+							</ul>
+
 						</div>
 					</div>
 				</div>
