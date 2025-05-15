@@ -14,7 +14,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Tasks/Tasks', ['tasks' => Task::all()]);
+        return Inertia::render('Tasks/Tasks', ['tasks' => Task::orderBy('created_at', 'desc')->paginate(10)]);
     }
 
     /**
@@ -22,7 +22,7 @@ class TaskController extends Controller
      */
     public function create()
     {
-		return Inertia::render('Tasks/CreateUpdateTask');
+        return Inertia::render('Tasks/CreateUpdateTask');
     }
 
     /**
@@ -30,11 +30,11 @@ class TaskController extends Controller
      */
     public function store(StoreUpdateTaskRequest $request)
     {
-		$validated = $request->validated();
+        $validated = $request->validated();
 
-		Task::create($validated);
+        Task::create($validated);
 
-		return redirect()->route('tasks.index')->with('success', "The task '{$validated['title']}' has been created successfully!");
+        return redirect()->route('tasks.index')->with('success', "The task '{$validated['title']}' has been created successfully!");
     }
 
     /**
