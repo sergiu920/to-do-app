@@ -52,7 +52,9 @@ class TaskController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $task = Task::find($id);
+
+        return Inertia::render('Tasks/CreateUpdateTask', []);
     }
 
     /**

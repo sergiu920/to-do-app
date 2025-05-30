@@ -6,6 +6,7 @@ import {Head, Link, router, usePage, useForm} from '@inertiajs/react';
 import {Button, Alert, List, ListItem, ListItemText, Typography,  Pagination, IconButton} from '@mui/material';
 import {useState} from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 export default function Tasks() {
 
@@ -87,14 +88,24 @@ export default function Tasks() {
                                     <ListItem
                                         key={task.id}
                                         secondaryAction={
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="delete"
-                                                onClick={() => openConfirmModal(task)}
-                                                color="error"
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            <>
+                                                <Link href={route('tasks.edit', task.id)}>
+                                                    <IconButton
+                                                        aria-label="edit"
+                                                        color="primary"
+                                                    >
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </Link>
+                                                <IconButton
+                                                    edge="end"
+                                                    aria-label="delete"
+                                                    onClick={() => openConfirmModal(task)}
+                                                    color="error"
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </>
                                         }
                                     >
                                         <ListItemText primary={`${task.id}. ${task.title}`} />
