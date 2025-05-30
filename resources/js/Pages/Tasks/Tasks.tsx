@@ -1,21 +1,46 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {Head, Link, router} from "@inertiajs/react";
-import {Button, Chip, FormControl, ListItemButton, ListItemText, Typography,  Pagination} from "@mui/material";
-import {useState} from "react";
-import { usePage } from "@inertiajs/react";
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
+import {Head, Link, router, usePage, useForm} from '@inertiajs/react';
+import {Button, Alert, List, ListItem, ListItemText, Typography,  Pagination, IconButton} from '@mui/material';
+import {useState} from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function Tasks() {
 
     const { flash, tasks } = usePage().props;
 
+    const {
+        processing,
+        delete: destroy,
+    } = useForm();
+
+    const [confirmingTaskDeletion, setConfirmingTaskDeletion] = useState(false);
+    const [deleteTaskData, setDeleteTaskData] = useState(null);
+
     const handlePageChange = (event, value) => {
-
-        console.log(event);
-        console.log(value);
-
         router.get(route('tasks.index'), { page: value}, {
             preserveState: false,
             preserveScroll: false,
+        });
+    }
+
+    const openConfirmModal = (task) => {
+        setConfirmingTaskDeletion(true);
+        setDeleteTaskData(task);
+    }
+
+    const closeConfirmModal = () => {
+        setConfirmingTaskDeletion(false);
+    }
+
+    const deleteTask: FormEventHandler = (e) => {
+        e.preventDefault();
+        destroy(route('tasks.destroy', deleteTaskData.id), {
+            preserveScroll: true,
+            onSuccess: () => setConfirmingTaskDeletion(false),
+            onFinish: () => setDeleteTaskData(null)
         });
     }
 
@@ -27,42 +52,85 @@ export default function Tasks() {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
 
-                        <div className="pl-6 pr-6 pt-6 text-gray-900">
-                            {/* Display success message */}
-                            {flash?.success && (
-                                <>
-                                    {flash.success}
-                                    <Chip label="success" color="success" className={'ml-2'} />
-                                </>
-                            )}
+                        <div className="flex justify-between items-start pl-6 pr-6 pt-6 text-gray-900 flex">
+                            <div>
+                                <Typography variant="h4" gutterBottom>
+                                    List of tasks
+                                </Typography>
+
+                            </div>
+                            <div className="text-right">
+                                <Link href={route("tasks.create")}>
+                                    <Button variant="contained">Add a Task</Button>
+                                </Link>
+                            </div>
                         </div>
 
                         <div className="p-6 text-gray-900">
-                            <Link href={route("tasks.create")}>
-                                <Button variant="contained">Add a Task</Button>
-                            </Link>
-                        </div>
-                        <div className="p-6 text-gray-900">
-                            <Typography variant="h4" component="h1" gutterBottom>
-                                List of tasks
-                            </Typography>
 
-                            <ul>
+                            <div>
+                                {flash.success && (
+                                    <Alert severity="success">
+                                        {flash.success}
+                                    </Alert>
+                                )}
+
+                                {flash.error && (
+                                    <Alert severity="error">
+                                        {flash.error}
+                                    </Alert>
+                                )}
+                            </div>
+
+                            <List>
                                 {tasks.data.map((task) => (
-                                    <li key={task.id}>
-                                        <ListItemButton>
-                                            <ListItemText primary={task.title} />
-                                        </ListItemButton>
-                                    </li>
+                                    <ListItem
+                                        key={task.id}
+                                        secondaryAction={
+                                            <IconButton
+                                                edge="end"
+                                                aria-label="delete"
+                                                onClick={() => openConfirmModal(task)}
+                                                color="error"
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        }
+                                    >
+                                        <ListItemText primary={`${task.id}. ${task.title}`} />
+                                    </ListItem>
                                 ))}
-                            </ul>
+                            </List>
 
-                            <Pagination
-                                count={tasks.last_page}
-                                page={tasks.current_page}
-                                onChange={handlePageChange}
-                                color="primary"
-                            />
+                            <div className="flex justify-end">
+                                <Pagination
+                                    count={tasks.last_page}
+                                    page={tasks.current_page}
+                                    onChange={handlePageChange}
+                                    color="primary"
+                                />
+                            </div>
+
+                            {deleteTaskData && (
+                                <Modal show={confirmingTaskDeletion} onClose={closeConfirmModal}>
+                                    <form onSubmit={deleteTask} className="p-6">
+                                        <Typography variant="h5" gutterBottom>
+                                            Are you sure that you want to delete this task?
+                                        </Typography>
+                                        <Typography variant="p">
+                                            {deleteTaskData.id}. {deleteTaskData.title}
+                                        </Typography>
+                                        <div className="mt-6 flex justify-end">
+                                            <SecondaryButton onClick={closeConfirmModal}>
+                                                Cancel
+                                            </SecondaryButton>
+                                            <DangerButton className="ms-3" disabled={processing}>
+                                                Delete Task
+                                            </DangerButton>
+                                        </div>
+                                    </form>
+                                </Modal>
+                            )}
 
                         </div>
                     </div>
