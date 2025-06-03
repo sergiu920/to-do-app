@@ -54,7 +54,13 @@ class TaskController extends Controller
     {
         $task = Task::find($id);
 
-        return Inertia::render('Tasks/CreateUpdateTask', []);
+        if(!$task) {
+            return back()->with('error', "The task with ID {$id} not found.");
+        }
+
+        return Inertia::render('Tasks/CreateUpdateTask', [
+            'task' => $task
+        ]);
     }
 
     /**
@@ -62,7 +68,14 @@ class TaskController extends Controller
      */
     public function update(StoreUpdateTaskRequest $request, string $id)
     {
-        //
+        $task = Task::find($id);
+        if(!$task) {
+            return back()->with('error', "The task with ID {$id} not found.");
+        }
+
+        $task->update($request->validated());
+
+        return back()->with('success', "The task has been updated successfully!");
     }
 
     /**
@@ -73,7 +86,7 @@ class TaskController extends Controller
         $task = Task::find($id);
 
         if(!$task) {
-            return back()->with('error', "Task with ID {$id} not found.");
+            return back()->with('error', "The task with ID {$id} not found.");
         }
 
         try {

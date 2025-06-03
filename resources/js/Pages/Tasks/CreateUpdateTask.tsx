@@ -1,33 +1,71 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {Head, useForm} from "@inertiajs/react";
-import {Box, Button, FormControl, TextField, Container} from "@mui/material";
+import {Head, useForm, usePage} from "@inertiajs/react";
+import {Box, Button, Alert, TextField, Container} from "@mui/material";
+import React, {useEffect} from "react";
 
+type Task = {
+    id: number,
+    title: string,
+    description: string
+}
 
-export default function CreateUpdateTask() {
+type Props = {
+    task?: Task // optional, because for "create" it can be undefined
+}
 
-    const { data, setData, post, processing, errors } = useForm({
-        title: "",
-        description: "",
+export default function CreateUpdateTask({ task }: Props) {
+
+    const {flash} = usePage().props;
+
+    const { data, setData, post, put, processing, errors } = useForm({
+        title: task?.title ?? '',
+        description: task?.description ?? '',
     });
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if(task) {
+            setData({
+                title: task.title,
+                description: task.description
+            })
+        }
+    }, [task])
+
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("tasks.store"));
+
+        if(task) {
+            put(route('tasks.update', task.id));
+        } else {
+            post(route('tasks.store'));
+        }
     };
 
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Create Task
+                    {task ? 'Update the Task' : 'Create Task'}
                 </h2>
             }
         >
-            <Head title="Create Task" />
+            <Head title={task ? 'Update the Task' : 'Create Task'} />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <Container className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className='mt-3'>
+                            {flash.error && (
+                                <Alert severity='error'>
+                                    {flash.error}
+                                </Alert>
+                            )}
+                            {flash.success && (
+                                <Alert severity='success'>
+                                    {flash.success}
+                                </Alert>
+                            )}
+                        </div>
                         <Box component="form" onSubmit={handleSubmit} noValidate>
                             <div>
                                 <TextField
@@ -63,7 +101,15 @@ export default function CreateUpdateTask() {
                                 fullWidth
                                 disabled={processing}
                             >
-                                {processing ? "Submitting..." : "Create a task"}
+                                {
+                                    processing
+                                        ? task
+                                            ? 'Updating...'
+                                            : 'Creating...'
+                                        : task
+                                            ? 'Update task'
+                                            : 'Create task'
+                                }
                             </Button>
                         </Box>
                     </Container>
