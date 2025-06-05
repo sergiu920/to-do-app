@@ -22,15 +22,6 @@ export default function CreateUpdateTask({ task }: Props) {
         description: task?.description ?? '',
     });
 
-    useEffect(() => {
-        if(task) {
-            setData({
-                title: task.title,
-                description: task.description
-            })
-        }
-    }, [task])
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
