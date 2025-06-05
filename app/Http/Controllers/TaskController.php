@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdateTaskRequest;
 use App\Models\Task;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('Tasks/Tasks', ['tasks' => Task::orderBy('created_at', 'desc')->paginate(10)]);
     }
@@ -20,7 +22,7 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Tasks/CreateUpdateTask');
     }
@@ -28,7 +30,7 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUpdateTaskRequest $request)
+    public function store(StoreUpdateTaskRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -50,22 +52,49 @@ class TaskController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $task = Task::find($id);
+
+        if(!$task) {
+            return back()->with('error', "The task with ID {$id} not found.");
+        }
+
+        return Inertia::render('Tasks/CreateUpdateTask', [
+            'task' => $task
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreUpdateTaskRequest $request, string $id)
     {
-        //
+        $task = Task::find($id);
+        if(!$task) {
+            return back()->with('error', "The task with ID {$id} not found.");
+        }
+
+        $task->update($request->validated());
+
+        return back()->with('success', "The task has been updated successfully!");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        //
+        $task = Task::find($id);
+
+        if(!$task) {
+            return back()->with('error', "The task with ID {$id} not found.");
+        }
+
+        try {
+            $task->delete();
+            return redirect()->back()->with('success', 'The task has been deleted successfully!');
+        } catch (\Throwable $th) {
+            Log::error('Failed to delete task', ['error' => $th->getMessage()]);
+            return back()->with('error', 'An error occurred while deleting the task.');
+        }
     }
 }

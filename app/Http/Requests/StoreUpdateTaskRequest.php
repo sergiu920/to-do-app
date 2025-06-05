@@ -22,8 +22,8 @@ class StoreUpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'title'       => 'required|string|max:255',
-			'description' => 'required|string|min:10',
+            'title'       => 'required|string|min:5|max:255',
+            'description' => 'required|string|min:10',
         ];
     }
 }
