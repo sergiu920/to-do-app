@@ -3,10 +3,12 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 import {Head, Link, router, usePage, useForm} from '@inertiajs/react';
-import {Button, Alert, List, ListItem, ListItemText, Typography,  Pagination, IconButton} from '@mui/material';
+import {Button, Alert, List, ListItem, ListItemText, Typography,  Pagination, IconButton, Tabs, Tab, Box, TextField} from '@mui/material';
 import {useState} from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ConfirmListModal from '@/MUIComponents/ConfirmModal';
 
 export default function Tasks() {
 
@@ -19,6 +21,8 @@ export default function Tasks() {
 
     const [confirmingTaskDeletion, setConfirmingTaskDeletion] = useState(false);
     const [deleteTaskData, setDeleteTaskData] = useState(null);
+    const [isModalAddListActive, setIsModalAddListActive] = useState(false);
+    const [tabValue, setTabValue] = useState(0);
 
     const handlePageChange = (event, value) => {
         router.get(route('tasks.index'), { page: value}, {
@@ -45,6 +49,49 @@ export default function Tasks() {
         });
     }
 
+    // ============================ Start Tabs ============================
+    const a11yProps = (index: number) => {
+        return {
+            id: `simple-tab-${index}`,
+            'aria-controls': `simple-tabpanel-${index}`,
+        };
+    }
+
+    const CustomTabPanel = (props: TabPanelProps) => {
+        const { children, value, index, ...other } = props;
+
+        return (
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`simple-tabpanel-${index}`}
+                aria-labelledby={`simple-tab-${index}`}
+                {...other}
+            >
+                {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+            </div>
+        );
+    }
+
+    const handleAddTab = () => {
+        // Display Modal - input name of the list
+        setIsModalAddListActive(true);
+    };
+
+    const closeModal = () => {
+        setIsModalAddListActive(false);
+    };
+
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+    };
+
+    const handleConfirmAddList = () => {
+        console.log('Request for add list')
+    }
+
+    // ============================ End Tabs ============================
+
     return (
         <AuthenticatedLayout>
             <Head title="Tasks" />
@@ -53,12 +100,39 @@ export default function Tasks() {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
 
+                        <div>
+                            <Box sx={{ display: 'flex', borderBottom: 1, borderColor: 'divider' }}>
+                                <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
+                                    <Tab label="Item One" {...a11yProps(0)} />
+                                    <Tab label="Item Two" {...a11yProps(1)} />
+                                    <Tab label="Item Three" {...a11yProps(2)} />
+                                </Tabs>
+                                <IconButton onClick={handleAddTab}>
+                                    <AddIcon />
+                                </IconButton>
+                            </Box>
+                            <CustomTabPanel value={tabValue} index={0}>
+                                Item One
+                            </CustomTabPanel>
+                            <CustomTabPanel value={tabValue} index={1}>
+                                Item Two
+                            </CustomTabPanel>
+                            <CustomTabPanel value={tabValue} index={2}>
+                                Item Three
+                            </CustomTabPanel>
+
+                            <ConfirmListModal
+                                open={isModalAddListActive}
+                                onClose={() => setIsModalAddListActive(false)}
+                                onConfirm={handleConfirmAddList}
+                            />
+                        </div>
+
                         <div className="flex justify-between items-start pl-6 pr-6 pt-6 text-gray-900 flex">
                             <div>
                                 <Typography variant="h4" gutterBottom>
                                     List of tasks
                                 </Typography>
-
                             </div>
                             <div className="text-right">
                                 <Link href={route("tasks.create")}>
