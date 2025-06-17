@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
 class Task extends Model
@@ -23,5 +24,10 @@ class Task extends Model
                 $task->user_id = Auth::id();
             }
         });
+    }
+
+    public function taskList(): BelongsTo
+    {
+        return $this->belongsTo(TaskList::class);
     }
 }
