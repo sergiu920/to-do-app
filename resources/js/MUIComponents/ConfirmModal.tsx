@@ -52,6 +52,7 @@ const ConfirmListModal: React.FC<ConfirmListModalProps> = ({open, onClose, onCon
                     value={listName}
                     onChange={(e) => setListName(e.target.value)}
                     autoFocus
+                    inputProps={{ maxLength: 50 }}
                 />
 
                 <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>

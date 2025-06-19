@@ -12,7 +12,7 @@ import ConfirmListModal from '@/MUIComponents/ConfirmModal';
 
 export default function Tasks() {
 
-    const { flash, tasks } = usePage().props;
+    const { flash, tasks, task_lists } = usePage().props;
 
     const {
         processing,
@@ -78,16 +78,20 @@ export default function Tasks() {
         setIsModalAddListActive(true);
     };
 
-    const closeModal = () => {
-        setIsModalAddListActive(false);
-    };
-
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
     };
 
-    const handleConfirmAddList = () => {
-        console.log('Request for add list')
+    const handleConfirmAddList = (listName) => {
+
+        router.post(route('task-lists.store'), {title: listName}, {
+            onSuccess: () => {
+                console.log('SUCCESS')
+            },
+            onError: (errors) => {
+                console.error(errors)
+            }
+        });
     }
 
     // ============================ End Tabs ============================
@@ -101,26 +105,35 @@ export default function Tasks() {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
 
                         <div>
-                            <Box sx={{ display: 'flex', borderBottom: 1, borderColor: 'divider' }}>
-                                <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
-                                    <Tab label="Item One" {...a11yProps(0)} />
-                                    <Tab label="Item Two" {...a11yProps(1)} />
-                                    <Tab label="Item Three" {...a11yProps(2)} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
+                                <Tabs
+                                    value={tabValue}
+                                    onChange={handleTabChange}
+                                    aria-label="basic tabs example"
+                                    sx={{ flexGrow: 1 }}
+                                >
+                                    {task_lists.map((list) => (
+                                        <Tab key={list.id} label={list.title} {...a11yProps(list.id)} />
+                                    ))}
                                 </Tabs>
-                                <IconButton onClick={handleAddTab}>
-                                    <AddIcon />
-                                </IconButton>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    startIcon={<AddIcon />}
+                                    onClick={handleAddTab}
+                                    sx={{ ml: 2 }}
+                                >
+                                    Create new list
+                                </Button>
                             </Box>
-                            <CustomTabPanel value={tabValue} index={0}>
-                                Item One
-                            </CustomTabPanel>
-                            <CustomTabPanel value={tabValue} index={1}>
-                                Item Two
-                            </CustomTabPanel>
-                            <CustomTabPanel value={tabValue} index={2}>
-                                Item Three
-                            </CustomTabPanel>
-
+                            {task_lists.length > 0 &&
+                                task_lists.map((list, index) => (
+                                    <CustomTabPanel key={index} value={tabValue} index={index}>
+                                        {/* list.tasks */}
+                                        Item One {tabValue}
+                                    </CustomTabPanel>
+                                ))
+                            }
                             <ConfirmListModal
                                 open={isModalAddListActive}
                                 onClose={() => setIsModalAddListActive(false)}

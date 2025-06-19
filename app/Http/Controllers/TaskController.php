@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdateTaskRequest;
 use App\Models\Task;
+use App\Models\TaskList;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -16,7 +17,10 @@ class TaskController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Tasks/Tasks', ['tasks' => Task::orderBy('created_at', 'desc')->paginate(10)]);
+        return Inertia::render('Tasks/Tasks', [
+            'task_lists' => TaskList::all(),
+            'tasks' => Task::orderBy('created_at', 'desc')->paginate(10)
+        ]);
     }
 
     /**
